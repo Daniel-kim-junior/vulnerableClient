@@ -1,24 +1,13 @@
 import React from 'react';
-import logo from './logo.svg';
+
 import './App.css';
+import { PathInput } from './components/PathInput';
 
 function App() {
+  const title: string = '여기에 폴더를 드래그 앤 드롭 해주세요';
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <PathInput placeholder={title}></PathInput>
     </div>
   );
 }
