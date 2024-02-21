@@ -1,7 +1,6 @@
 
-import { faFolder } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useRef, useState } from "react"
+import { FormEventHandler, KeyboardEventHandler, useRef, useState } from "react"
+import { api } from "../api";
 declare module "react" {
   interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
     webkitdirectory?: string;
@@ -15,11 +14,17 @@ type PropType = {
 
 
 export function PathInput({placeholder}: PropType) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [isSelected, setIsSelected] = useState(false);
+  const [inputValue, setInputValue] = useState<string>('');
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [directory, setDirectory] = useState<FileList>();
+  const titleStyle: React.CSSProperties = {
+    fontSize: '36px',
+
+  }
+
   const inputStyle: React.CSSProperties = {
-    width: '20px', // Example width
-    height: '20px', // Example height
+    width: '500px', // Example width
+    height: '500px', // Example height
     padding: '5px', // Example padding
     border: 'none',
     backgroundImage: `url('data:image/svg+xml;utf8,${encodeURIComponent(
@@ -32,36 +37,61 @@ export function PathInput({placeholder}: PropType) {
     appearance: 'none', // Remove default appearance
     cursor: 'pointer', // Add pointer cursor for better interaction
     outline: 'none', // Remove outline on focus
+    transition: 'background-color 0.3s, box-shadow 0.3s',
+    
   }
+  const hoverInputStyle: React.CSSProperties = {
+    ...inputStyle,
+    backgroundColor: 'gray'
+  }
+
 
   const inputContainerStyle: React.CSSProperties = {
     position: 'relative',
     display: 'inline-block',
   };
 
-  const inputHandler = () => {
-    setIsSelected(inputRef.current !== null)
+  const inputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const directory: HTMLInputElement = e.target;
+    const len : number = directory.value.length;
+    if (len > 0) {
+      const files: FileList = directory.files ? directory.files : new FileList();
+      const fileName = files[0].webkitRelativePath.split('/')[0];
+      setDirectory(files);
+      setInputValue(fileName);
+    }
+    setIsHovered(false)
+  }
+
+  const submitHandler = async (e : React.FormEvent) => {
+    const { postData } = api();
+
+  }
+
+  const onKeyDownHandler = (e: React.KeyboardEvent) => {
+    e.preventDefault();
   }
 
 
   return (<main>
-    <p>{placeholder}</p>
-    <div style={inputContainerStyle}>
+    <h3 style={titleStyle}>{placeholder}</h3>
+    <form style={inputContainerStyle}>
     <input
-        style={inputStyle}
-        ref={inputRef}
+        style={isHovered ? hoverInputStyle : inputStyle}
         type="file"
         webkitdirectory=""
         directory=""
         mozdirectory=""
+        onDragOver={() => setIsHovered(true)}
+        onDragLeave={() => setIsHovered(false)}
         onChange={inputHandler}
+        onKeyDown={onKeyDownHandler}
       />
+      {inputValue && (<p>{inputValue}</p>)}
       <div>
-        1
-        {isSelected ? 'hi' : 'hello'}
+        <button onSubmit={submitHandler}>취약점 분석</button>
       </div>
-    </div>
-
+    </form>
   </main>)
 }
 
